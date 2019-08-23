@@ -309,12 +309,25 @@ var board_to_moves = function(board) {
     return src2dsts;
 };
 
-var redraw_board = function(board, src2dsts) {
+var redraw_board = function(board, src2dsts, src) {
     $('.cell').removeClass('src');
     $('.cell').removeClass('dst');
-    for (var src in src2dsts) {
-        $('#cell_' + src).addClass('dst');
+    if (src === null) {
+        for (var src in src2dsts) {
+            $('#cell_' + src).addClass('dst');
+        }
+    } else {
+        $('#cell_' + src).addClass('src');
+        var dsts = src2dsts[src];
+        for (var i = 0; i < dsts.length; ++i) {
+            var dst = dsts[i].y + '_' + dsts[i].x;
+            $('#cell_' + dst).addClass('dst');
+        }
     }
+};
+
+var move = function() {
+    // TODO
 };
 
 var board = [
@@ -327,7 +340,36 @@ var board = [
 
 var src2dsts = board_to_moves(board);
 
-redraw_board(board, src2dsts);
+var src = null;
+
+redraw_board(board, src2dsts, src);
+
+var clicked = function(y, x) {
+    if (src === null) {
+        src = y + '_' + x;
+        if (!(src in src2dsts)) {
+            return;
+        }
+        redraw_board(board, src2dsts, src);
+    } else {
+        var dst = y + '_' + x;
+        var dsts = src2dsts[src];
+        var ok = false;
+        for (var i = 0; i < dsts.length; ++i) {
+            if (dst.y == dsts[i].y && dst.x == dsts[i].x) {
+                ok = true;
+                break;
+            }
+        }
+        if (!ok) {
+            return;
+        }
+        move(board, src, dst);
+        src2dsts = board_to_moves(board);
+        src = null;
+        redraw_board(board, src2dsts, src);
+    }
+};
   </script>
 </body>
 </html>
