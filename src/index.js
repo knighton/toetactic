@@ -1,3 +1,4 @@
+var bcrypt = require('bcrypt');
 var express = require('express');
 var fs = require('fs');
 var http = require('http');
@@ -33,8 +34,38 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded());
 
-// User database.
-var user_db = [];
+if (!fs.existsSync('data/')) {
+    fs.mkdirSync('data/');
+}
+
+var load_user_db = function(filename) {
+    if (!fs.existsSync(filename)) {
+        return [];
+    }
+    var user_db = [];
+    var lines = fs.readFileSync(filename).split('\n');
+    for (var i = 0; i < lines.length; ++i) {
+        var line = lines[i];
+        var user = JSON.parse(line);
+        user_db.push(user);
+    }
+    return user_db;
+};
+
+var save_user_db = function(user_db, filename) {
+    if (fs.existsSync(filename)) {
+        fs.unlinkSync(filename);
+    }
+    var lines = [];
+    for (var i = 0; i < user_db.length; ++i) {
+        var user = user_db[i];
+        var line = JSON.stringify(user);
+        lines.push(line);
+    }
+    fs.writeFileSync(filename, lines.join('\n'));
+};
+
+var user_db = load_user_db('data/users.jsonl');
 
 var get_user_by_username = function(username) {
     for (var i = 0; i < user_db.length; ++i) {
@@ -155,9 +186,10 @@ app.post('/api/register', function(req, res) {
     var user = {
         id: id,
         username: req.body.username,
-        password: req.body.password,
+        password: bcrypt.hashSync(req.body.password, 10),
     };
     user_db.push(user);
+    save_user_db(user_db, 'data/users.jsonl');
     req.session.username = user.username;
     res.send(make_ok());
 });
@@ -171,7 +203,7 @@ app.post('/api/login', function(req, res) {
     for (var i = 0; i < user_db.length; ++i) {
         var user = user_db[i];
         if (req.body.username == user.username &&
-                req.body.password == user.password) {
+                bcrypt.compareSync(req.body.password, user.password)) {
             req.session.username = user.username;
             res.send(make_ok());
             return;
