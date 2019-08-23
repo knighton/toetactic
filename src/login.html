@@ -93,6 +93,7 @@ var login = function() {
         password: pass,
     };
     $.post('/api/login', data, function(r) {
+        var r = JSON.parse(r);
         if (r.error) {
             alert(r.error);
             return;

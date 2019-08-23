@@ -517,6 +517,7 @@ var clicked = function(y, x) {
 
 var logout = function() {
     $.post('/api/logout', {}, function(r) {
+        var r = JSON.parse(r);
         if (r.error) {
             alert(r.error);
             return;

@@ -78,6 +78,7 @@ input {
   <script type="text/javascript">
 var logout = function() {
     $.post('/api/logout', {}, function(r) {
+        var r = JSON.parse(r);
         if (r.error) {
             alert(r.error);
             return;

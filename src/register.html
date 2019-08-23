@@ -101,6 +101,7 @@ var register = function() {
         password: pass,
     };
     $.post('/api/register', data, function(r) {
+        var r = JSON.parse(r);
         if (r.error) {
             alert(r.error);
             return;

@@ -34,11 +34,11 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 // User database.
-var users = [];
+var user_db = [];
 
 var get_user_by_username = function(username) {
-    for (var i = 0; i < users.length; ++i) {
-        var user = users[i];
+    for (var i = 0; i < user_db.length; ++i) {
+        var user = user_db[i];
         if (user.username == username) {
             return user;
         }
@@ -48,8 +48,12 @@ var get_user_by_username = function(username) {
 
 // -----------------------------------------------------------------------------
 
+var is_logged_in = function(req) {
+    return req.session && req.session.username;
+};
+
 app.get('/', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         var f = 'src/main.html';
     } else {
         var f = 'src/index.html';
@@ -60,7 +64,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/help', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         var f = 'src/help_in.html';
     } else {
         var f = 'src/help_out.html';
@@ -71,7 +75,7 @@ app.get('/help', function(req, res) {
 });
 
 app.get('/practice', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         var f = 'src/practice_in.html';
     } else {
         var f = 'src/practice_out.html';
@@ -82,7 +86,7 @@ app.get('/practice', function(req, res) {
 });
 
 app.get('/login', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         res.redirect('/');
         return;
     }
@@ -93,7 +97,7 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/register', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         res.redirect('/');
         return;
     }
@@ -104,7 +108,7 @@ app.get('/register', function(req, res) {
 });
 
 app.get('/play/:vs', function(req, res) {
-    if (!res.session.username) {
+    if (!is_logged_in(req)) {
         res.redirect('/');
         return;
     }
@@ -130,46 +134,46 @@ var make_error = function(s) {
 };
 
 var make_ok = function() {
-    return make_error('');
+    return make_error(null);
 };
 
 app.post('/api/register', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         res.send(make_error('already_logged_in'));
         return;
     }
 
-    for (var i = 0; i < users.length; ++i) {
-        var user = users[i];
+    for (var i = 0; i < user_db.length; ++i) {
+        var user = user_db[i];
         if (req.body.username == user.username) {
             res.send(make_error('username_is_taken'));
             return;
         }
     }
 
-    var id = users.length;
+    var id = user_db.length;
     var user = {
         id: id,
         username: req.body.username,
         password: req.body.password,
     };
-    users.push(user);
+    user_db.push(user);
     req.session.username = user.username;
     res.send(make_ok());
 });
 
 app.post('/api/login', function(req, res) {
-    if (req.session.username) {
+    if (is_logged_in(req)) {
         res.send(make_error('already_logged_in'));
         return;
     }
 
-    for (var i = 0; i < users.length; ++i) {
-        var user = users[i];
+    for (var i = 0; i < user_db.length; ++i) {
+        var user = user_db[i];
         if (req.body.username == user.username &&
-                req.body.pasword == user.password) {
+                req.body.password == user.password) {
             req.session.username = user.username;
-            res.send(make_ok);
+            res.send(make_ok());
             return;
         }
     }
@@ -178,7 +182,7 @@ app.post('/api/login', function(req, res) {
 });
 
 app.post('/api/logout', function(req, res) {
-    if (!req.session.username) {
+    if (!is_logged_in(req)) {
         res.send(make_error('not_logged_in'));
         return;
     }
