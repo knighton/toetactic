@@ -1,0 +1,71 @@
+<html>
+<head>
+  <style type="text/css">
+body {
+    margin: 0px;
+    background: black;
+    color: white;
+    background: radial-gradient(circle at top,
+        #303038 0%,
+        #101018 50%,
+        #000008 100%
+    );
+}
+a:link {
+    text-decoration: none;
+    color: #88c;
+}
+a:visited {
+    color: #448;
+}
+#page {
+    margin-left: auto;
+    margin-right: auto;
+}
+#buttons {
+    margin-left: auto;
+    margin-right: auto;
+    border-spacing: 20px;
+    font-size: 150%;
+}
+.button {
+    padding: 10px;
+    box-shadow: 0px 0px 20px #667;
+    transition: 0.5s;
+    text-align: center;
+}
+.button:hover {
+    background: rgba(225, 225, 255, 0.05);
+}
+#title {
+    color: white;
+    margin-top: 100px;
+    text-align: center;
+    padding: 50px;
+    font-size: 500%;
+    text-shadow: 0px 0px 20px white;
+}
+.ti {
+    padding: 5px;
+    font-size: inherit;
+    font-family: inherit;
+}
+  </style>
+</head>
+<body>
+  <a href="/"><div id="title">T O E T A C T I C</div></a>
+  <div id="page">
+    <table id="buttons">
+      <tr>
+        <td><a href="/login"><div class="button">Login</div></a></td>
+        <td><a href="/register"><div class="button">Register</div></a></td>
+      </tr>
+      <!-- begin hack :: get alignment just right with login/register pages -->
+      <tr style="visibility: hidden">
+        <td colspan="2"><input class="ti" type="text"></input><td>
+      </tr>
+      <!-- end hack -->
+    </table>
+  </div>
+</body>
+</html>
