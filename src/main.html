@@ -58,8 +58,18 @@ input {
 }
 #content {
     margin-top: 25px;
+    width: 500px;
     margin-left: auto;
     margin-right: auto;
+}
+.user {
+    font-size: 125%;
+    padding: 10px;
+    margin: 5px;
+    transition: 0.5s;
+}
+.user:hover {
+    background: rgba(50, 50, 75, 0.5);
 }
   </style>
 </head>
@@ -74,8 +84,26 @@ input {
       </tr>
     </table>
   </div>
+  <ol id="content">
+  </ol>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
+$.post('/api/get_users', {}, function(r) {
+    var r = JSON.parse(r);
+    if (r.error) {
+        alert(r.error);
+        return;
+    }
+    var rows = [];
+    for (var i = 0; i < r.users.length; ++i) {
+        var user = r.users[i];
+        //var row = '<tr class="user"><td>' + user.username + '</td></tr>';
+        var row = '<li class="user">' + user.username + '</li>';
+        rows.push(row);
+    }
+    $('#content').html(rows.join(''));
+});
+
 var logout = function() {
     $.post('/api/logout', {}, function(r) {
         var r = JSON.parse(r);

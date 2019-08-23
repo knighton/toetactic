@@ -43,7 +43,7 @@ var load_user_db = function(filename) {
         return [];
     }
     var user_db = [];
-    var lines = fs.readFileSync(filename).split('\n');
+    var lines = fs.readFileSync(filename).toString().split('\n');
     for (var i = 0; i < lines.length; ++i) {
         var line = lines[i];
         var user = JSON.parse(line);
@@ -221,6 +221,23 @@ app.post('/api/logout', function(req, res) {
 
     req.session.destroy();
     res.send(make_ok());
+});
+
+app.post('/api/get_users', function(req, res) {
+    var rr = [];
+    for (var i = 0; i < user_db.length; ++i) {
+        var user = user_db[i];
+        var r = {
+            id: user.id,
+            username: user.username,
+        };
+        rr.push(r);
+    }
+    var r = {
+        error: null,
+        users: rr,
+    };
+    res.send(JSON.stringify(r));
 });
 
 // -----------------------------------------------------------------------------
