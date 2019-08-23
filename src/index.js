@@ -36,26 +36,40 @@ app.use(express.urlencoded());
 // User database.
 var users = [];
 
+var get_user_by_username = function(username) {
+    for (var i = 0; i < users.length; ++i) {
+        var user = users[i];
+        if (user.username == username) {
+            return user;
+        }
+    }
+    return null;
+};
+
 // -----------------------------------------------------------------------------
 
 app.get('/', function(req, res) {
     if (req.session.username) {
-        fs.readFile('src/play.html', 'utf8', function(err, data) {
-            if (err) {
-                res.send('');
-                return;
-            }
+        fs.readFile('src/lobby.html', 'utf8', function(err, data) {
             res.send(data);
         });
     } else {
         fs.readFile('src/index.html', 'utf8', function(err, data) {
-            if (err) {
-                res.send('');
-                return;
-            }
             res.send(data);
         });
     }
+});
+
+app.get('/help', function(req, res) {
+    fs.readFile('src/help.html', 'utf8', function(err, data) {
+        res.send(data);
+    });
+});
+
+app.get('/practice', function(req, res) {
+    fs.readFile('src/practice.html', 'utf8', function(err, data) {
+        res.send(data);
+    });
 });
 
 app.get('/login', function(req, res) {
@@ -65,10 +79,6 @@ app.get('/login', function(req, res) {
     }
 
     fs.readFile('src/login.html', 'utf8', function(err, data) {
-        if (err) {
-            res.send('');
-            return;
-        }
         res.send(data);
     });
 });
@@ -80,10 +90,23 @@ app.get('/register', function(req, res) {
     }
 
     fs.readFile('src/register.html', 'utf8', function(err, data) {
-        if (err) {
-            res.send('');
-            return;
-        }
+        res.send(data);
+    });
+});
+
+app.get('/play/:vs', function(req, res) {
+    if (!res.session.username) {
+        res.redirect('/');
+        return;
+    }
+
+    var vs = get_user_by_username(request.params.vs);
+    if (!vs) {
+        res.redirect('/');
+        return;
+    }
+
+    fs.readFile('src/play.html', 'utf8', function(err, data) {
         res.send(data);
     });
 });
@@ -115,7 +138,9 @@ app.post('/api/register', function(req, res) {
         }
     }
 
+    var id = users.length;
     var user = {
+        id: id,
         username: req.body.username,
         password: req.body.password,
     };

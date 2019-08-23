@@ -21,62 +21,71 @@ a:visited {
 input {
     color: white;
     border: none;
-    background: #303038;
-    box-shadow: 0px 0px 20px #303038;
+    background: inherit;
+    padding: 10px;
+    font-size: 125%;
+    font-family: inherit;
+    box-shadow: 0px 0px 20px #445;
+    margin: 5px;
 }
-#page {
+#title {
+    color: white;
+    margin-top: 125px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 400%;
+    text-shadow: 0px 0px 20px white;
+}
+#menu_outer {
+    width: 100%;
+    box-shadow: 0px 0px 20px #445;
+}
+#menu_inner {
     margin-left: auto;
     margin-right: auto;
+    border-spacing: 10px;
+    font-size: 125%;
 }
-#buttons {
-    margin-left: auto;
-    margin-right: auto;
-    border-spacing: 20px;
-    font-size: 150%;
-}
-.button {
+.menu_item {
     padding: 10px;
     box-shadow: 0px 0px 20px #667;
     transition: 0.5s;
     text-align: center;
-}
-.button:hover {
     background: rgba(225, 225, 255, 0.05);
 }
-#title {
-    color: white;
-    margin-top: 100px;
-    text-align: center;
-    padding: 50px;
-    font-size: 500%;
-    text-shadow: 0px 0px 20px white;
+.menu_item:hover {
+    background: rgba(0, 0, 0, 0);
 }
-.ti {
-    padding: 5px;
-    font-size: inherit;
-    font-family: inherit;
+#content {
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
 }
   </style>
 </head>
 <body>
   <a href="/"><div id="title">T O E T A C T I C</div></a>
-  <div id="page">
-    <table id="buttons">
+  <div id="menu_outer">
+    <table id="menu_inner">
       <tr>
-        <td><a href="/login"><div class="button">Login</div></a></td>
-        <td><div class="button">Register</div></td>
-      </tr>
-      <tr>
-        <td colspan="2"><input autofocus class="ti" id="user" type="text" placeholder="username"></input><td>
-      </tr>
-      <tr>
-        <td colspan="2"><input class="ti" id="pass" type="password" placeholder="password"></input></td>
-      </tr>
-      <tr>
-        <td colspan="2"><input class="ti" id="repass" type="password" placeholder="pw again"></input></td>
+        <td><a href="/help"><div class="menu_item">Help</div></a></td>
+        <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
+        <td><a href="/login"><div class="menu_item">Login</div></a></td>
+        <td><div class="menu_item">Register</div></td>
       </tr>
     </table>
   </div>
+  <table id="content">
+    <tr>
+      <td><input autofocus id="user" type="text" placeholder="username"></input><td>
+    </tr>
+    <tr>
+      <td><input id="pass" type="password" placeholder="password"></input></td>
+    </tr>
+    <tr>
+      <td><input id="repass" type="password" placeholder="password again"></input></td>
+    </tr>
+  </table>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
 var register = function() {

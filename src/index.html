@@ -18,53 +18,61 @@ a:link {
 a:visited {
     color: #448;
 }
-#page {
+input {
+    color: white;
+    border: none;
+    background: inherit;
+    padding: 10px;
+    font-size: 125%;
+    font-family: inherit;
+    box-shadow: 0px 0px 20px #445;
+    margin: 5px;
+}
+#title {
+    color: white;
+    margin-top: 125px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 400%;
+    text-shadow: 0px 0px 20px white;
+}
+#menu_outer {
+    width: 100%;
+    box-shadow: 0px 0px 20px #445;
+}
+#menu_inner {
     margin-left: auto;
     margin-right: auto;
+    border-spacing: 10px;
+    font-size: 125%;
 }
-#buttons {
-    margin-left: auto;
-    margin-right: auto;
-    border-spacing: 20px;
-    font-size: 150%;
-}
-.button {
+.menu_item {
     padding: 10px;
     box-shadow: 0px 0px 20px #667;
     transition: 0.5s;
     text-align: center;
-}
-.button:hover {
     background: rgba(225, 225, 255, 0.05);
 }
-#title {
-    color: white;
-    margin-top: 100px;
-    text-align: center;
-    padding: 50px;
-    font-size: 500%;
-    text-shadow: 0px 0px 20px white;
+.menu_item:hover {
+    background: rgba(0, 0, 0, 0);
 }
-.ti {
-    padding: 5px;
-    font-size: inherit;
-    font-family: inherit;
+#content {
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
 }
   </style>
 </head>
 <body>
   <a href="/"><div id="title">T O E T A C T I C</div></a>
-  <div id="page">
-    <table id="buttons">
+  <div id="menu_outer">
+    <table id="menu_inner">
       <tr>
-        <td><a href="/login"><div class="button">Login</div></a></td>
-        <td><a href="/register"><div class="button">Register</div></a></td>
+        <td><a href="/help"><div class="menu_item">Help</div></a></td>
+        <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
+        <td><a href="/login"><div class="menu_item">Login</div></a></td>
+        <td><a href="/register"><div class="menu_item">Register</div></a></td>
       </tr>
-      <!-- begin hack :: get alignment just right with login/register pages -->
-      <tr style="visibility: hidden">
-        <td colspan="2"><input class="ti" type="text"></input><td>
-      </tr>
-      <!-- end hack -->
     </table>
   </div>
 </body>

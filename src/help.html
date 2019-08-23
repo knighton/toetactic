@@ -28,6 +28,9 @@ input {
     box-shadow: 0px 0px 20px #445;
     margin: 5px;
 }
+li {
+    margin: 10px;
+}
 #title {
     color: white;
     margin-top: 125px;
@@ -60,6 +63,8 @@ input {
     margin-top: 25px;
     margin-left: auto;
     margin-right: auto;
+    width: 500px;
+    font-size: 125%;
 }
   </style>
 </head>
@@ -68,45 +73,23 @@ input {
   <div id="menu_outer">
     <table id="menu_inner">
       <tr>
-        <td><a href="/help"><div class="menu_item">Help</div></a></td>
+        <td><div class="menu_item">Help</div></td>
         <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
-        <td><div class="menu_item">Login</div></td>
+        <td><a href="/login"><div class="menu_item">Login</div></a></td>
         <td><a href="/register"><div class="menu_item">Register</div></a></td>
       </tr>
     </table>
   </div>
-  <table id="content">
-    <tr>
-      <td><input autofocus id="user" type="text" placeholder="username"></input><td>
-    </tr>
-    <tr>
-      <td><input id="pass" type="password" placeholder="password"></input></td>
-    </tr>
-  </table>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script type="text/javascript">
-var login = function() {
-    var user = $('#user').val();
-    var pass = $('#pass').val();
-    var data = {
-        username: user,
-        password: pass,
-    };
-    $.post('/api/login', data, function(r) {
-        if (r.error) {
-            alert(r.error);
-            return;
-        }
-        window.location = '/';
-    });
-};
-
-$('input').keypress(function(e) {
-    if (e.which == 13) {
-        login();
-        return false;
-    }
-});
-  </script>
+  <ol id="content">
+    <li>Tic-tac-toe with chess pieces.  Just click "Practice" and go for it.  You should get the hang of it quickly.</li>
+    <li>Two players alternate turns.</li>
+    <li>The board is 5x5, with the space for tic-tac-toe in the middle 3x3.</li>
+    <li>You start with your pieces not on the board.  Pieces can only be placed on the outside edge of the board.</li>
+    <li>Pieces on the board can be moved one space at a time, in any direction.</li>
+    <li>If you move a piece, it pushes any pieces ahead of it out of the way.  It is helpful to chain pieces in this manner.</li>
+    <li>The edge of the board is like a wall.</li>
+    <li>You have five pieces: Queen (big), Knight (medium), and three Pawn (small).</li>
+    <li>Pieces can push other pieces of the same size or smaller.  Which side the piece is on doesn't matter.</li>
+  </ol>
 </body>
 </html>
