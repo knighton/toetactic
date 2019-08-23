@@ -120,8 +120,9 @@ input {
     <table id="menu_inner">
       <tr>
         <td><a href="/help"><div class="menu_item">Help</div></a></td>
-        <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
-        <td><a href="#" onclick="logout()"><div class="menu_item">Logout</div></a></td>
+        <td><div class="menu_item">Practice</div></td>
+        <td><a href="/login"><div class="menu_item">Login</div></a></td>
+        <td><a href="/register"><div class="menu_item">Register</div></a></td>
       </tr>
     </table>
   </div>
@@ -499,15 +500,6 @@ var clicked = function(y, x) {
         src_obj = null;
         redraw_board(board, src2dsts, src_str);
     }
-};
-var logout = function() {
-    $.post('/api/logout', {}, function(r) {
-        if (r.error) {
-            alert(r.error);
-            return;
-        }
-        window.location = '/';
-    });
 };
   </script>
 </body>

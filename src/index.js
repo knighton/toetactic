@@ -71,7 +71,12 @@ app.get('/help', function(req, res) {
 });
 
 app.get('/practice', function(req, res) {
-    fs.readFile('src/practice.html', 'utf8', function(err, data) {
+    if (req.session.username) {
+        var f = 'src/practice_in.html';
+    } else {
+        var f = 'src/practice_out.html';
+    }
+    fs.readFile(f, 'utf8', function(err, data) {
         res.send(data);
     });
 });
