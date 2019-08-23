@@ -50,18 +50,22 @@ var get_user_by_username = function(username) {
 
 app.get('/', function(req, res) {
     if (req.session.username) {
-        fs.readFile('src/lobby.html', 'utf8', function(err, data) {
-            res.send(data);
-        });
+        var f = 'src/main.html';
     } else {
-        fs.readFile('src/index.html', 'utf8', function(err, data) {
-            res.send(data);
-        });
+        var f = 'src/index.html';
     }
+    fs.readFile(f, 'utf8', function(err, data) {
+        res.send(data);
+    });
 });
 
 app.get('/help', function(req, res) {
-    fs.readFile('src/help.html', 'utf8', function(err, data) {
+    if (req.session.username) {
+        var f = 'src/help_in.html';
+    } else {
+        var f = 'src/help_out.html';
+    }
+    fs.readFile(f, 'utf8', function(err, data) {
         res.send(data);
     });
 });

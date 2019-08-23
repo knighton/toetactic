@@ -1,0 +1,106 @@
+<html>
+<head>
+  <style type="text/css">
+body {
+    margin: 0px;
+    background: black;
+    color: white;
+    background: radial-gradient(circle at top,
+        #303038 0%,
+        #101018 50%,
+        #000008 100%
+    );
+}
+a:link {
+    text-decoration: none;
+    color: #88c;
+}
+a:visited {
+    color: #448;
+}
+input {
+    color: white;
+    border: none;
+    background: inherit;
+    padding: 10px;
+    font-size: 125%;
+    font-family: inherit;
+    box-shadow: 0px 0px 20px #445;
+    margin: 5px;
+}
+li {
+    margin: 10px;
+}
+#title {
+    color: white;
+    margin-top: 125px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 400%;
+    text-shadow: 0px 0px 20px white;
+}
+#menu_outer {
+    width: 100%;
+    box-shadow: 0px 0px 20px #445;
+}
+#menu_inner {
+    margin-left: auto;
+    margin-right: auto;
+    border-spacing: 10px;
+    font-size: 125%;
+}
+.menu_item {
+    padding: 10px;
+    box-shadow: 0px 0px 20px #667;
+    transition: 0.5s;
+    text-align: center;
+    background: rgba(225, 225, 255, 0.05);
+}
+.menu_item:hover {
+    background: rgba(0, 0, 0, 0);
+}
+#content {
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    font-size: 125%;
+}
+  </style>
+</head>
+<body>
+  <a href="/"><div id="title">T O E T A C T I C</div></a>
+  <div id="menu_outer">
+    <table id="menu_inner">
+      <tr>
+        <td><a href="/help"><div class="menu_item">Help</div></a></td>
+        <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
+        <td><a href="#" onclick="logout()"><div class="menu_item">Logout</div></a></td>
+      </tr>
+    </table>
+  </div>
+  <ol id="content">
+    <li>Tic-tac-toe with chess pieces.  Just click "Practice" and go for it.  You should get the hang of it quickly.</li>
+    <li>Two players alternate turns.</li>
+    <li>The board is 5x5, with the space for tic-tac-toe in the middle 3x3.</li>
+    <li>You start with your pieces not on the board.  Pieces can only be placed on the outside edge of the board.</li>
+    <li>Pieces on the board can be moved one space at a time, in any direction.</li>
+    <li>If you move a piece, it pushes any pieces ahead of it out of the way.  It is helpful to chain pieces in this manner.</li>
+    <li>The edge of the board is like a wall.</li>
+    <li>You have five pieces: Queen (big), Knight (medium), and three Pawn (small).</li>
+    <li>Pieces can push other pieces of the same size or smaller.  Which side the piece is on doesn't matter.</li>
+  </ol>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript">
+var logout = function() {
+    $.post('/api/logout', {}, function(r) {
+        if (r.error) {
+            alert(r.error);
+            return;
+        }
+        window.location = '/';
+    });
+};
+  </script>
+</body>
+</html>
