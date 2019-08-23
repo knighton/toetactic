@@ -33,8 +33,13 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded());
 
+// User database.
+var users = [];
+
+// -----------------------------------------------------------------------------
+
 app.get('/', function(req, res) {
-    if (req.session.user) {
+    if (req.session.username) {
         fs.readFile('src/play.html', 'utf8', function(err, data) {
             if (err) {
                 res.send('');
@@ -54,7 +59,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/login', function(req, res) {
-    if (req.session.user) {
+    if (req.session.username) {
         res.redirect('/');
         return;
     }
@@ -69,7 +74,7 @@ app.get('/login', function(req, res) {
 });
 
 app.get('/register', function(req, res) {
-    if (req.session.user) {
+    if (req.session.username) {
         res.redirect('/');
         return;
     }
@@ -82,6 +87,73 @@ app.get('/register', function(req, res) {
         res.send(data);
     });
 });
+
+// -----------------------------------------------------------------------------
+
+var make_error = function(s) {
+    var x = {
+        error: s
+    };
+    return JSON.stringify(x);
+};
+
+var make_ok = function() {
+    return make_error('');
+};
+
+app.post('/api/register', function(req, res) {
+    if (req.session.username) {
+        res.send(make_error('already_logged_in'));
+        return;
+    }
+
+    for (var i = 0; i < users.length; ++i) {
+        var user = users[i];
+        if (req.body.username == user.username) {
+            res.send(make_error('username_is_taken'));
+            return;
+        }
+    }
+
+    var user = {
+        username: req.body.username,
+        password: req.body.password,
+    };
+    users.push(user);
+    req.session.username = user.username;
+    res.send(make_ok());
+});
+
+app.post('/api/login', function(req, res) {
+    if (req.session.username) {
+        res.send(make_error('already_logged_in'));
+        return;
+    }
+
+    for (var i = 0; i < users.length; ++i) {
+        var user = users[i];
+        if (req.body.username == user.username &&
+                req.body.pasword == user.password) {
+            req.session.username = user.username;
+            res.send(make_ok);
+            return;
+        }
+    }
+
+    res.send(make_error('bad'));
+});
+
+app.post('/api/logout', function(req, res) {
+    if (!res.session.username) {
+        res.send(make_error('not_logged_in'));
+        return;
+    }
+
+    req.session.destroy();
+    res.send(make_ok());
+});
+
+// -----------------------------------------------------------------------------
 
 https.createServer(options, app).listen(443);
 http.createServer(app).listen(80);

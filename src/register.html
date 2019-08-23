@@ -92,7 +92,10 @@ var register = function() {
         password: pass,
     };
     $.post('/api/register', data, function(r) {
-        alert(r);
+        if (r.error) {
+            alert(r.error);
+            return;
+        }
         window.location = '/';
     });
 };

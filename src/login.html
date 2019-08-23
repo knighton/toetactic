@@ -84,7 +84,10 @@ var login = function() {
         password: pass,
     };
     $.post('/api/login', data, function(r) {
-        alert(r);
+        if (r.error) {
+            alert(r.error);
+            return;
+        }
         window.location = '/';
     });
 };
