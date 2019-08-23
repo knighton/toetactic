@@ -173,7 +173,7 @@ app.post('/api/login', function(req, res) {
 });
 
 app.post('/api/logout', function(req, res) {
-    if (!res.session.username) {
+    if (!req.session.username) {
         res.send(make_error('not_logged_in'));
         return;
     }
