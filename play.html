@@ -122,5 +122,212 @@ body {
       </td>
     </tr>
   </table>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript">
+var directions = [
+    {
+        y: 1,
+        x: 0,
+    },
+    {
+        y: 1,
+        x: 1,
+    },
+    {
+        y: 0,
+        x: 1,
+    },
+    {
+        y: -1,
+        x: 1,
+    },
+    {
+        y: -1,
+        x: 0,
+    },
+    {
+        y: -1,
+        x: -1,
+    },
+    {
+        y: 0,
+        x: -1,
+    },
+    {
+        y: 1,
+        x: -1,
+    },
+];
+
+var edge_squares = [
+    {
+        y: 0,
+        x: 1,
+    },
+    {
+        y: 0,
+        x: 2,
+    },
+    {
+        y: 0,
+        x: 3,
+    },
+    {
+        y: 0,
+        x: 4,
+    },
+    {
+        y: 0,
+        x: 5,
+    },
+    {
+        y: 1,
+        x: 1,
+    },
+    {
+        y: 1,
+        x: 5,
+    },
+    {
+        y: 2,
+        x: 1,
+    },
+    {
+        y: 2,
+        x: 5,
+    },
+    {
+        y: 3,
+        x: 1,
+    },
+    {
+        y: 3,
+        x: 5.
+    },
+    {
+        y: 4,
+        x: 1,
+    },
+    {
+        y: 4,
+        x: 2,
+    },
+    {
+        y: 4,
+        x: 3,
+    },
+    {
+        y: 4,
+        x: 4,
+    },
+    {
+        y: 4,
+        x: 5,
+    },
+];
+
+var can_move_in_direction = function(board, cy, cx, dy, dx) {
+    var y = cy
+    var x = cx;
+    var rr = [];
+    while (true) {
+        y += dy;
+        if (y < 1 || 5 < y) {
+            break;
+        }
+        x += dx;
+        if (x < 1 || 5 < x) {
+            break;
+        }
+        var r = {
+            y: y,
+            x: x,
+        };
+        rr.push(r);
+    }
+    var limit = Math.abs(board[cy][cx]);
+    var has_room = false;
+    for (var i = 0; i < rr.length; ++i) {
+        var r = rr[i];
+        var piece = board[r.y][r.x];
+        if (!piece) {
+            has_room = true;
+            break;
+        }
+        if (limit < Math.abs(piece)) {
+            return false;
+        }
+    }
+    return has_room;
+};
+
+var get_adjancent_dsts = function(board, cy, cx) {
+    var dsts = [];
+    for (var i = 0; i < directions.length; ++i) {
+        var d = directions[i];
+        if (!can_move_in_direction(board, cy, cx, d.y, d.x)) {
+            continue;
+        }
+        var dst = {
+            y: cy + d.y,
+            x: cx + d.x,
+        };
+        dsts.push(dst);
+    }
+    return dsts;
+};
+
+var get_edge_dsts = function(board) {
+    var dsts = [];
+    for (var i = 0; i < edge_squares.length; ++i) {
+        var dst = edge_squares[i];
+        if (!board[dst.y][dst.x]) {
+            dsts.push(dst);
+        }
+    }
+    return dsts;
+};
+
+var square_to_moves = function(board, y, x) {
+    if (1 <= x && x <= 5) {
+        return get_adjacent_dsts(board, y, x);
+    } else {
+        return get_edge_dsts(board);
+    }
+};
+
+var board_to_moves = function(board) {
+    var src2dsts = {};
+    for (var y = 0; y < 5; ++y) {
+        for (var x = 0; x < 7; ++x) {
+            if (board[y][x] <= 0) {
+                continue;
+            }
+            src2dsts[y + '_' + x] = square_to_moves(board, y, x);
+        }
+    }
+    return src2dsts;
+};
+
+var redraw_board = function(board, src2dsts) {
+    $('.cell').removeClass('src');
+    $('.cell').removeClass('dst');
+    for (var src in src2dsts) {
+        $('#cell_' + src).addClass('dst');
+    }
+};
+
+var board = [
+    [3, 0, 0, 0, 0, 0, -3],
+    [2, 0, 0, 0, 0, 0, -2],
+    [1, 0, 0, 0, 0, 0, -1],
+    [1, 0, 0, 0, 0, 0, -1],
+    [1, 0, 0, 0, 0, 0, -1],
+];
+
+var src2dsts = board_to_moves(board);
+
+redraw_board(board, src2dsts);
+  </script>
 </body>
 </html>
