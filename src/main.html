@@ -88,6 +88,8 @@ input {
   </ol>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
+var my_username = '{{my_username}}';
+
 $.post('/api/get_users', {}, function(r) {
     var r = JSON.parse(r);
     if (r.error) {
@@ -99,6 +101,9 @@ $.post('/api/get_users', {}, function(r) {
         var user = r.users[i];
         //var row = '<tr class="user"><td>' + user.username + '</td></tr>';
         var row = '<li class="user">' + user.username + '</li>';
+        if (user.username != my_username) {
+            row = '<a href="/play/' + user.username + '">' + row + '</a>';
+        }
         rows.push(row);
     }
     $('#content').html(rows.join(''));

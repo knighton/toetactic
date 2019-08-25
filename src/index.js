@@ -72,12 +72,16 @@ var is_logged_in = function(req) {
 app.get('/', function(req, res) {
     if (is_logged_in(req)) {
         var f = 'src/main.html';
+        fs.readFile(f, 'utf8', function(err, data) {
+            data = data.replace(/{{my_username}}/g, req.session.username);
+            res.send(data);
+        });
     } else {
         var f = 'src/index.html';
+        fs.readFile(f, 'utf8', function(err, data) {
+            res.send(data);
+        });
     }
-    fs.readFile(f, 'utf8', function(err, data) {
-        res.send(data);
-    });
 });
 
 app.get('/help', function(req, res) {
@@ -130,14 +134,13 @@ app.get('/play/:vs', function(req, res) {
         return;
     }
 
-    var vs = get_user_by_username(request.params.vs);
-    if (!vs) {
+    if (!req.params.vs) {
         res.redirect('/');
         return;
     }
 
     fs.readFile('src/play.html', 'utf8', function(err, data) {
-        data = data.replace('{{vs}}', vs);
+        data = data.replace(/{{vs}}/g, req.params.vs);
         res.send(data);
     });
 });
