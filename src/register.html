@@ -16,7 +16,7 @@ a:link {
     color: #88c;
 }
 a:visited {
-    color: #448;
+    color: #66a;
 }
 input {
     color: white;
@@ -77,28 +77,40 @@ input {
   </div>
   <table id="content">
     <tr>
-      <td><input autofocus id="user" type="text" placeholder="username"></input><td>
+      <td><input autofocus id="username" type="text" placeholder="username"></input><td>
     </tr>
     <tr>
-      <td><input id="pass" type="password" placeholder="password"></input></td>
+      <td><input id="password" type="password" placeholder="password"></input></td>
     </tr>
     <tr>
-      <td><input id="repass" type="password" placeholder="password again"></input></td>
+      <td><input id="repeat_password" type="password" placeholder="repeat password"></input></td>
+    </tr>
+    <tr>
+      <td><input id="elo" type="text" placeholder="ELO" value="1000"></input></td>
+    </tr>
+    <tr>
+      <td><input id="email" type="text" placeholder="email (optional)"></input></td>
     </tr>
   </table>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
 var register = function() {
-    var user = $('#user').val();
-    var pass = $('#pass').val();
-    var repass = $('#repass').val();
-    if (pass != repass) {
+    var username = $('#username').val();
+    var password = $('#password').val();
+    var repeat_password = $('#repeat_password').val();
+    var elo = $('#elo').val();
+    var email = $('#email').val();
+
+    if (password != repeat_password) {
         alert('passwords do not match!');
         return;
     }
+
     var data = {
-        username: user,
-        password: pass,
+        username: username,
+        password: password,
+        elo: elo,
+        email: email
     };
     $.post('/api/register', data, function(r) {
         var r = JSON.parse(r);
