@@ -54,8 +54,8 @@ db.serialize(function() {
 
     db.run('CREATE TABLE IF NOT EXISTS games (' +
         'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
-        'lower_uid INTEGER NOT NULL, ' +
-        'higher_uid INTEGER NOT NULL, ' +
+        'white INTEGER NOT NULL, ' +
+        'black INTEGER NOT NULL, ' +
         'begin REAL NOT NULL, ' +
         'end REAL, ' +
         'winner INTEGER, ' +
@@ -64,6 +64,7 @@ db.serialize(function() {
 });
 
 // -----------------------------------------------------------------------------
+// UI.
 
 var is_logged_in = function(req) {
     return req.session && req.session.username;
@@ -146,6 +147,7 @@ app.get('/play/:vs', function(req, res) {
 });
 
 // -----------------------------------------------------------------------------
+// API.
 
 var make_error = function(s) {
     var x = {
@@ -307,6 +309,11 @@ app.post('/api/logout', function(req, res) {
 });
 
 app.post('/api/get_users', function(req, res) {
+    if (!is_logged_in(req)) {
+        res.send(make_error('not_logged_in'));
+        return;
+    }
+
     var sql = 'SELECT username, elo FROM users ORDER BY elo DESC';
     var params = [];
     db.all(sql, params, function(err, rows) {
@@ -325,6 +332,93 @@ app.post('/api/get_users', function(req, res) {
         };
         var s = JSON.stringify(r);
         res.send(s);
+    });
+});
+
+app.post('/api/start_or_resume_game', function(req, res) {
+    if (!is_logged_in(req)) {
+        res.send(make_error('not_logged_in'));
+        return;
+    }
+
+    if (!req.body.vs) {
+        res.send(make_error('vs_dne'));
+        return;
+    }
+
+    var sql = 'SELECT id FROM users WHERE username=?';
+    var params = [req.body.vs];
+    db.get(sql, params, function(err, row) {
+        if (!row) {
+            res.send(make_error('no_such_vs'));
+            return;
+        }
+
+        var vs_uid = row.id;
+
+        var sql = 'SELECT id, white, data FROM games WHERE ' +
+            '((white=? AND black=?) OR (white=? AND black=?)) AND ' +
+            'end is NULL';
+        var params = [req.session.uid, vs_uid, vs_uid, req.session.uid];
+        db.get(sql, params, function(err, row) {
+            if (row) {
+                var x = JSON.parse(row.data);
+                if (row.white == req.session.uid) {
+                    var color = 'white';
+                } else {
+                    var color = 'black';
+                }
+                var head = {
+                    color: color,
+                    body: {}
+                };
+                x.unshift(head);
+                var r = {
+                    error: null,
+                    data: x,
+                };
+                var s = JSON.stringify(r);
+                res.send(s);
+                return;
+            }
+
+            if (Math.random() < 0.5) {
+                var white = req.session.uid;
+                var black = vs_uid;
+            } else {
+                var white = vs_uid;
+                var black = req.session.uid;
+            }
+            var begin = (new Date).getTime() / 1000;
+            var data = '[]';
+
+            var sql = 'INSERT INTO games (white, black, begin, data) VALUES' +
+                '(?, ?, ?, ?)';
+            var params = [
+                white,
+                black,
+                begin,
+                data,
+            ];
+            db.run(sql, params);
+
+            if (white == req.session.uid) {
+                var color = 'white';
+            } else {
+                var color = 'black';
+            }
+            var head = {
+                color: color,
+                body: {}
+            };
+            data = [head];
+            var r = {
+                error: null,
+                data: data
+            };
+            var s = JSON.stringify(r);
+            res.send(s);
+        });
     });
 });
 

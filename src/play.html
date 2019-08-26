@@ -154,6 +154,7 @@ input {
         <td><a href="/help"><div class="menu_item">Help</div></a></td>
         <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
         <td><a href="#" onclick="logout()"><div class="menu_item">Logout</div></a></td>
+        <td><a href="#" onclick="resign()"><div class="menu_item">Resign</div></a></td>
       </tr>
     </table>
   </div>
@@ -226,13 +227,13 @@ var white_pawn = '&#x2659';
 var black_pawn = '&#x265F';
 
 var pieces = [
-    black_queen,
-    black_knight,
-    black_pawn,
-    '',
-    white_pawn,
-    white_knight,
     white_queen,
+    white_knight,
+    white_pawn,
+    '',
+    black_pawn,
+    black_knight,
+    black_queen,
 ];
 
 var directions = [
@@ -527,6 +528,7 @@ var clicked = function(y, x) {
         };
         move(board, src_obj, dst_obj);
         src2dsts = board_to_moves(board);
+        upload_move(src_obj, dst_obj);
         src_str = null;
         src_obj = null;
         redraw_board(board, src2dsts, src_str);
@@ -543,6 +545,36 @@ var logout = function() {
         window.location = '/practice';
     });
 };
+
+var resign = function() {
+    $.post('/api/resign', {}, function(r) {
+        var r = JSON.parse(r);
+        if (r.error) {
+            alert(r.error);
+            return;
+        }
+        window.location.reload();
+    });
+};
+
+var upload_move = function(src, dst) {
+    var x = {
+        src: src,
+        dst: dst,
+    };
+    $.post('/api/move', x, function(r) {
+        var r = JSON.parse(r);
+        if (r.error) {
+            alert(r.error);
+            return;
+        }
+    });
+};
+
+$.post('/api/start_or_resume_game', {vs: '{{vs}}'}, function(r) {
+    var r = JSON.parse(r);
+    console.log(r);
+});
   </script>
 </body>
 </html>
