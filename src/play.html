@@ -10,6 +10,8 @@ body {
         #101018 50%,
         #000008 100%
     );
+    height: 100%;
+    font-family: FreeSerif;
 }
 a:link {
     text-decoration: none;
@@ -89,6 +91,7 @@ input {
     background: #00d !important;
 }
 .cell {
+    height: 60px;
     width: 60px;
     text-align: center;
     transition: 0.5s;
@@ -155,7 +158,7 @@ input {
         <td><a href="/help"><div class="menu_item">Help</div></a></td>
         <td><a href="/practice"><div class="menu_item">Practice</div></a></td>
         <td><a href="#" onclick="logout()"><div class="menu_item">Logout</div></a></td>
-        <td><a href="#" onclick="resign()"><div class="menu_item">Resign</div></a></td>
+        <!--<td><a href="#" onclick="resign()"><div class="menu_item">Resign</div></a></td>-->
       </tr>
     </table>
   </div>
@@ -413,8 +416,14 @@ var board_to_moves = function(board) {
     var src2dsts = {};
     for (var y = 0; y < 5; ++y) {
         for (var x = 0; x < 7; ++x) {
-            if (board[y][x] <= 0) {
-                continue;
+            if (is_white) {
+                if (board[y][x] <= 0) {
+                    continue;
+                }
+            } else {
+                if (0 <= board[y][x]) {
+                    continue;
+                }
             }
             src2dsts[y + '_' + x] = square_to_moves(board, y, x);
         }
@@ -496,9 +505,34 @@ var src2dsts = board_to_moves(board);
 var src_str = null;
 var src_obj = null;
 
+var is_my_turn = 0;
+var is_white = 0;
+
 redraw_board(board, src2dsts, src_str);
 
+var reset_board = function() {
+    board = [
+        [3, 0, 0, 0, 0, 0, -3],
+        [2, 0, 0, 0, 0, 0, -2],
+        [1, 0, 0, 0, 0, 0, -1],
+        [1, 0, 0, 0, 0, 0, -1],
+        [1, 0, 0, 0, 0, 0, -1],
+    ];
+
+    src2dsts = board_to_moves(board);
+
+    src_str = null;
+    src_obj = null;
+
+    is_my_turn = null;
+    is_white = null;
+};
+
 var clicked = function(y, x) {
+    if (!is_my_turn) {
+        return;
+    }
+
     if (src_str === null) {
         var tmp = y + '_' + x;
         if (!(tmp in src2dsts)) {
@@ -528,11 +562,12 @@ var clicked = function(y, x) {
             x: x,
         };
         move(board, src_obj, dst_obj);
-        src2dsts = board_to_moves(board);
+        src2dsts = {};  // src2dsts = board_to_moves(board);
         upload_move(src_obj, dst_obj);
         src_str = null;
         src_obj = null;
         redraw_board(board, src2dsts, src_str);
+        is_my_turn = 0;
     }
 };
 
@@ -560,8 +595,11 @@ var resign = function() {
 
 var upload_move = function(src, dst) {
     var x = {
-        src: src,
-        dst: dst,
+        vs: '{{vs}}',
+        src_y: src.y,
+        src_x: src.x,
+        dst_y: dst.y,
+        dst_x: dst.x
     };
     $.post('/api/move', x, function(r) {
         var r = JSON.parse(r);
@@ -572,10 +610,53 @@ var upload_move = function(src, dst) {
     });
 };
 
-$.post('/api/start_or_resume_game', {vs: '{{vs}}'}, function(r) {
-    var r = JSON.parse(r);
-    console.log(r);
-});
+var refresh = function() {
+    $.post('/api/get_game', {vs: '{{vs}}'}, function(r) {
+        if (is_my_turn) {
+            return;
+        }
+        reset_board();
+        var r = JSON.parse(r);
+        if (r.error) {
+            return;
+        }
+
+        is_my_turn = r.data[0].body.color == 'white' ? 1 : 0;
+        is_white = is_my_turn;
+        src2dsts = board_to_moves(board);
+        for (var i = 1; i < r.data.length; ++i) {
+            var item = r.data[i];
+            if (item.type == 'resign') {
+                return;
+            } else if (item.type == 'move') {
+                src_obj = {
+                    y: item.body.src_y,
+                    x: item.body.src_x,
+                };
+                src_str = item.body.src_y + '_' + item.body.src_x;
+                var dst_obj = {
+                    y: item.body.dst_y,
+                    x: item.body.dst_x,
+                };
+                move(board, src_obj, dst_obj);
+            } else {
+                return;
+            }
+            is_my_turn = is_my_turn ? 0 : 1;
+        }
+        if (is_my_turn) {
+            src2dsts = board_to_moves(board);
+        } else {
+            src2dsts = {};
+        }
+        src_str = null;
+        sc_obj = null;
+        redraw_board(board, src2dsts, src_str);
+    });
+};
+
+refresh();
+setInterval(refresh, 1000);
   </script>
 </body>
 </html>

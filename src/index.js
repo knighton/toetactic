@@ -335,7 +335,7 @@ app.post('/api/get_users', function(req, res) {
     });
 });
 
-app.post('/api/start_or_resume_game', function(req, res) {
+app.post('/api/get_game', function(req, res) {
     if (!is_logged_in(req)) {
         res.send(make_error('not_logged_in'));
         return;
@@ -369,8 +369,10 @@ app.post('/api/start_or_resume_game', function(req, res) {
                     var color = 'black';
                 }
                 var head = {
-                    color: color,
-                    body: {}
+                    type: 'color',
+                    body: {
+                        color: color,
+                    }
                 };
                 x.unshift(head);
                 var r = {
@@ -408,8 +410,10 @@ app.post('/api/start_or_resume_game', function(req, res) {
                 var color = 'black';
             }
             var head = {
-                color: color,
-                body: {}
+                type: 'color',
+                body: {
+                    color: color,
+                }
             };
             data = [head];
             var r = {
@@ -418,6 +422,147 @@ app.post('/api/start_or_resume_game', function(req, res) {
             };
             var s = JSON.stringify(r);
             res.send(s);
+        });
+    });
+});
+
+app.post('/api/move', function(req, res) {
+    if (!is_logged_in(req)) {
+        res.send(make_error('not_logged_in'));
+        return;
+    }
+
+    if (!req.body.vs) {
+        res.send(make_error('vs_dne'));
+        return;
+    }
+
+    var src_y = parseInt(req.body.src_y);
+    if (src_y === undefined) {
+        res.send(make_error('src_y_dne'));
+        return;
+    }
+    if ([0, 1, 2, 3, 4].indexOf(src_y) == -1) {
+        res.send(make_error('bad_src_y'));
+        return;
+    }
+
+    var src_x = parseInt(req.body.src_x);
+    if (src_x === undefined) {
+        res.send(make_error('src_x_dne'));
+        return;
+    }
+    if ([0, 1, 2, 3, 4, 5, 6].indexOf(src_x) == -1) {
+        res.send(make_error('bad_src_x'));
+        return;
+    }
+
+    var dst_y = parseInt(req.body.dst_y);
+    if (dst_y === undefined) {
+        res.send(make_error('dst_y_dne'));
+        return;
+    }
+    if ([0, 1, 2, 3, 4].indexOf(dst_y) == -1) {
+        res.send(make_error('bad_dst_y'));
+        return;
+    }
+
+    var dst_x = parseInt(req.body.dst_x);
+    if (dst_x === undefined) {
+        res.send(make_error('dst_x_dne'));
+        return;
+    }
+    if ([0, 1, 2, 3, 4, 5, 6].indexOf(dst_x) == -1) {
+        res.send(make_error('bad_dst_x'));
+        return;
+    }
+
+    var sql = 'SELECT id FROM users WHERE username=?';
+    var params = [req.body.vs];
+    db.get(sql, params, function(err, row) {
+        if (!row) {
+            res.send(make_error('no_such_vs'));
+            return;
+        }
+
+        var vs_uid = row.id;
+
+        var sql = 'SELECT id, white, data FROM games WHERE ' +
+            '((white=? AND black=?) OR (white=? AND black=?)) AND ' +
+            'end is NULL';
+        var params = [req.session.uid, vs_uid, vs_uid, req.session.uid];
+        db.get(sql, params, function(err, row) {
+            if (!row) {
+                res.send(make_error('no_such_game'));
+                return;
+            }
+
+            var gid = row.id;
+            var xx = JSON.parse(row.data);
+            var x = {
+                type: 'move',
+                body: {
+                    src_y: src_y,
+                    src_x: src_x,
+                    dst_y: dst_y,
+                    dst_x: dst_x,
+                }
+            };
+            xx.push(x);
+            var data = JSON.stringify(xx);
+
+            var sql = 'UPDATE games SET data=? WHERE id=?';
+            var params = [data, gid];
+            db.run(sql, params);
+            res.send(make_ok());
+        });
+    });
+});
+
+app.post('/api/resign', function(req, res) {
+    if (!is_logged_in(req)) {
+        res.send(make_error('not_logged_in'));
+        return;
+    }
+
+    if (!req.body.vs) {
+        res.send(make_error('vs_dne'));
+        return;
+    }
+
+    var sql = 'SELECT id FROM users WHERE username=?';
+    var params = [req.body.vs];
+    db.get(sql, params, function(err, row) {
+        if (!row) {
+            res.send(make_error('no_such_vs'));
+            return;
+        }
+
+        var vs_uid = row.id;
+
+        var sql = 'SELECT id, white, data FROM games WHERE ' +
+            '((white=? AND black=?) OR (white=? AND black=?)) AND ' +
+            'end is NULL';
+        var params = [req.session.uid, vs_uid, vs_uid, req.session.uid];
+        db.get(sql, params, function(err, row) {
+            if (!row) {
+                res.send(make_error('no_such_game'));
+                return;
+            }
+
+            var gid = row.id;
+            var xx = JSON.parse(row.data);
+            var x = {
+                type: 'resign',
+                body: {}
+            };
+            xx.push(x);
+            var data = JSON.stringify(xx);
+
+            var sql = 'UPDATE games SET data=? WHERE id=?';
+            var params = [data, gid];
+            db.run(sql, params);
+            res.send(make_ok());
         });
     });
 });
